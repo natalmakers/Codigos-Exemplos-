@@ -1,18 +1,35 @@
-#include <stdio.h>
-#include "adxl345.h"
+#include <Wire.h> 
 
-int main() {
-    // Inicializar o acelerômetro
-    adxl345_init();
+#define ADXL345_ADDRESS (0x53) 
 
-    // Lê os valores de aceleração dos três eixos
-    int x, y, z;
-    adxl345_read_acceleration(&x, &y, &z);
+void setup() {
+  Wire.begin();
+  // Inicializar o acelerômetro
+  Wire.beginTransmission(ADXL345_ADDRESS);
+  Wire.write(0x2D); 
+  Wire.write(0x08); 
+  Wire.endTransmission();
+}
 
-    // Imprime os valores de aceleração
-    printf("X = %d\n", x);
-    printf("Y = %d\n", y);
-    printf("Z = %d\n", z);
-
-    return 0;
+void loop() {
+  int x, y, z;
+  // Lê os valores de aceleração dos três eixos
+  Wire.beginTransmission(ADXL345_ADDRESS);
+  Wire.write(0x32); 
+  Wire.endTransmission();
+  Wire.requestFrom(ADXL345_ADDRESS, 6);
+  x = Wire.read(); 
+  x |= Wire.read() << 8; 
+  y = Wire.read(); 
+  y |= Wire.read() << 8; 
+  z = Wire.read(); 
+  z |= Wire.read() << 8; 
+  // Imprime os valores de aceleração
+  Serial.print("X = ");
+  Serial.print(x);
+  Serial.print(", Y = ");
+  Serial.print(y);
+  Serial.print(", Z = ");
+  Serial.println(z);
+  delay(1000);
 }
